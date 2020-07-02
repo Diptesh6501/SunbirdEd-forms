@@ -1,7 +1,9 @@
 <div class="sb-checkbox">
-    <span><label>checkbox name</label></span>
-    <div *ngFor="let value of valuesInArr">
-        <label>{{value}}</label>
-        <span><input type="checkbox" name="checkbox" value={{value}}></span>
+    <div class="checkbox-row">
+        <label class="container">
+            <input type="checkbox" [formControl]="formControlRef" name="checkbox" value="value">
+            <span class="checkmark"></span>
+        </label>
+        <label class="checkbox-label">{{label}}</label>
     </div>
 </div>

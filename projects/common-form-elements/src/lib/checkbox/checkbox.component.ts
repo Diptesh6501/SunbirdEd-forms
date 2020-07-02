@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'sb-checkbox',
@@ -7,15 +8,13 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class CheckboxComponent implements OnInit {
   @Input() label: any;
-  @Input() values: any;
-  valuesInArr = [];
+  @Input() code: any;
+  @Input() value?: any;
+  @Input() formControlRef?: FormControl;
 
   constructor() { }
 
   ngOnInit() {
-    for (const prop of Object.keys(this.values)) {
-      this.valuesInArr.push(this.values[prop]);
-    }
   }
 
 }

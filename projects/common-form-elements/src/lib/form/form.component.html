@@ -27,7 +27,7 @@
       </sb-textarea>
     </div>
     <div *ngIf="field.type === FieldConfigInputType.CHECKBOX" [hidden]="field.templateOptions?.hidden || null">
-      <sb-checkbox [label]="field.code" [values]="field.templateOptions.labelHtml.values"></sb-checkbox>
+      <sb-checkbox [code]="field.code"  [formControlRef]="formGroup.get(field.code)" [label]="field.templateOptions.label" [value]="field.default"></sb-checkbox>
     </div>
     <div *ngIf="asyncValidatorFactory && field.asyncValidation?.trigger">
       <button

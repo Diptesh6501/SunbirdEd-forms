@@ -15,6 +15,7 @@ export enum FieldConfigInputType {
 export enum FieldConfigValidationType {
   REQUIRED = 'required',
   MAXLENGTH = 'maxLength',
+  REQUIRED_TRUE = 'required_true',
   MINLENGTH = 'minLength',
   PATTERN = 'pattern'
 }

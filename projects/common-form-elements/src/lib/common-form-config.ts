@@ -9,7 +9,8 @@ export enum FieldConfigInputType {
   LABEL = 'label',
   TEXTAREA = 'textarea',
   NESTED_SELECT = 'nested_select',
-  NESTED_GROUP = 'nested_group'
+  NESTED_GROUP = 'nested_group',
+  MULTIPLE_SELECT= 'multiple_select'
 }
 
 export enum FieldConfigValidationType {

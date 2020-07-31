@@ -1,8 +1,8 @@
-import { Component, OnInit, Input, SimpleChanges, OnChanges, ElementRef, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { Subscription, Observable, Subject } from 'rxjs';
-import { FieldConfigOption, FieldConfigOptionsBuilder, FieldConfigOptionAssociations } from '../common-form-config';
-import { tap } from 'rxjs/operators';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {Observable, Subject, Subscription} from 'rxjs';
+import {FieldConfigOption, FieldConfigOptionsBuilder} from '../common-form-config';
+import {tap} from 'rxjs/operators';
 
 
 @Component({
@@ -28,6 +28,8 @@ export class MultipleDropdownComponent implements OnInit, OnChanges {
   valuesLabel = '';
   options$?: Observable<FieldConfigOption<any>[]>;
   contextValueChangesSubscription?: Subscription;
+  optionsType: 'ARRAY' | 'CLOSURE' | 'MAP';
+
   constructor() {
   }
 
@@ -42,11 +44,21 @@ export class MultipleDropdownComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['options'] || !changes['options'].currentValue) {
+      return;
+    }
+
     if (!this.options) {
       this.options = [];
     }
 
-    if (this.isOptionsClosure(this.options) && !this.options$) {
+    if (this.isOptionsArray()) {
+      this.optionsType = 'ARRAY';
+    } else if (this.isOptionsMap()) {
+      this.optionsType = 'MAP';
+    } else if (this.isOptionsClosure()) {
+      this.optionsType = 'CLOSURE';
+
       this.options$ = (this.options as FieldConfigOptionsBuilder<any>)(
         this.formControlRef,
         this.context,
@@ -106,17 +118,15 @@ export class MultipleDropdownComponent implements OnInit, OnChanges {
     this.showValues = false;
   }
 
-  isOptionsArray(options: any) {
-    return Array.isArray(options);
-
+  private isOptionsArray() {
+    return Array.isArray(this.options);
   }
 
-  isOptionsClosure(options: any) {
-    return typeof options === 'function';
+  private isOptionsClosure() {
+    return typeof this.options === 'function';
   }
 
-  isOptionsMap(input: any) {
-    return !Array.isArray(input) && typeof input === 'object';
+  private isOptionsMap() {
+    return !Array.isArray(this.options) && typeof this.options === 'object';
   }
-
 }

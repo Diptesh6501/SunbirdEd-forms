@@ -21,7 +21,7 @@
         </div>
         <div class="body">
           <ul>
-            <ng-container *ngIf="isOptionsArray(options)">
+            <ng-container *ngIf="optionsType === 'ARRAY'">
               <li *ngFor="let option of options; let i=index">
                 <div class="row" (click)="addSelected(option)">
                   <label class="container">
@@ -32,7 +32,7 @@
                 </div>
               </li>
             </ng-container>
-            <ng-container *ngIf="isOptionsClosure(options) && options$" id="listLoaded">
+            <ng-container *ngIf="optionsType === 'CLOSURE'">
               <ng-container *ngIf="(options$ | async) as optionsList">
                 <li *ngFor="let option of optionsList; let i=index">
                   <div class="row" (click)="addSelected(option)">
@@ -45,7 +45,7 @@
                 </li>
               </ng-container>
             </ng-container>
-            <ng-container *ngIf="isOptionsMap(options) && context && context.value" id="listLoaded">
+            <ng-container *ngIf="optionsType === 'MAP' && this.context && this.context.value">
               <li *ngFor="let option of options[context.value]; let i=index">
                 <div class="row" (click)="addSelected(option)">
                   <label class="container">

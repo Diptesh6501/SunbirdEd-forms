@@ -9,13 +9,16 @@ import { FormComponent } from './form/form.component';
 import { OptionGroupComponent } from './option-group/option-group.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DropdownIconComponent } from './icon/dropdown/dropdownIcon.component';
+import { MultipleDropdownComponent } from './multiple-dropdown/multiple-dropdown.component';
+import { CaretDownComponent } from './icon/caret-down/caret-down.component';
 
 @NgModule({
    declarations: [CommonFormElementsComponent, DropdownComponent, TextboxComponent,
-      TextareaComponent, CheckboxComponent, FormComponent, OptionGroupComponent, DropdownIconComponent],
+      TextareaComponent, CheckboxComponent, FormComponent,
+      OptionGroupComponent, DropdownIconComponent, MultipleDropdownComponent, CaretDownComponent],
    imports: [CommonModule, ReactiveFormsModule, FormsModule
    ],
-   exports: [CommonFormElementsComponent, DropdownComponent,
+   exports: [CommonFormElementsComponent, DropdownComponent, CaretDownComponent,
       TextboxComponent, TextareaComponent, CheckboxComponent, FormComponent, OptionGroupComponent, DropdownIconComponent]
 })
 export class CommonFormElementsModule { }

@@ -1,5 +1,17 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
-import {FieldConfig, FieldConfigInputType, FieldConfigValidationType} from '../common-form-config';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  QueryList,
+  SimpleChanges,
+  ViewChildren
+} from '@angular/core';
+import {AsyncValidatorFactory, FieldConfig, FieldConfigInputType, FieldConfigValidationType} from '../common-form-config';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Subject, Subscription} from 'rxjs';
 import {distinctUntilChanged, map, scan, tap} from 'rxjs/operators';
@@ -9,7 +21,7 @@ import {distinctUntilChanged, map, scan, tap} from 'rxjs/operators';
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.css']
 })
-export class FormComponent implements OnInit, OnChanges, OnDestroy {
+export class FormComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
   @Output() initialize = new EventEmitter();
   @Output() finalize = new EventEmitter();
 
@@ -18,6 +30,9 @@ export class FormComponent implements OnInit, OnChanges, OnDestroy {
   @Output() dataLoadStatus = new EventEmitter<'LOADING' | 'LOADED'>();
   @Input() config;
   @Input() dataLoadStatusDelegate = new Subject<'LOADING' | 'LOADED'>();
+  @Input() asyncValidatorFactory?: AsyncValidatorFactory;
+
+  @ViewChildren('validationTrigger') validationTriggers: QueryList<HTMLElement>;
 
   formGroup: FormGroup;
 
@@ -119,6 +134,17 @@ export class FormComponent implements OnInit, OnChanges, OnDestroy {
     ).subscribe();
   }
 
+  ngAfterViewInit() {
+    this.config.forEach(element => {
+      if (element.asyncValidation && element.asyncValidation.asyncValidatorFactory) {
+        this.formGroup.get(element.code).setAsyncValidators(element.asyncValidation.asyncValidatorFactory(
+          element.asyncValidation.marker,
+          this.validationTriggers
+        ));
+      }
+    });
+  }
+
   onNestedFormFinalize(nestedFormGroup: FormGroup, fieldConfig: FieldConfig<any>) {
     if (!this.formGroup.get('children') || !this.formGroup.get(`children.${fieldConfig.code}`)) {
       return;
@@ -136,6 +162,7 @@ export class FormComponent implements OnInit, OnChanges, OnDestroy {
       this.formGroup.addControl('children', new FormGroup({}));
     }
 
+    (this.formGroup.get('children') as FormGroup).removeControl(fieldConfig.code);
     (this.formGroup.get('children') as FormGroup).addControl(fieldConfig.code, nestedFormGroup);
   }
 
@@ -164,7 +191,8 @@ export class FormComponent implements OnInit, OnChanges, OnDestroy {
     switch (element.type) {
       case FieldConfigInputType.INPUT:
         defaultVal = element.templateOptions.type === 'number' ?
-          (element.default && Number.isInteger(element.default) ? element.default : 0) : null;
+          (element.default && Number.isInteger(element.default) ? element.default : 0) :
+          (element.default && (typeof element.default) === 'string' ? element.default : '');
         break;
       case FieldConfigInputType.SELECT:
       case FieldConfigInputType.NESTED_SELECT:

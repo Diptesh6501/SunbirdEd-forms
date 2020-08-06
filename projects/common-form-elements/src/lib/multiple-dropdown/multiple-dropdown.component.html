@@ -1,0 +1,69 @@
+<div class="multi-select-container">
+  <sb-caret-down class="caret-down"
+    [attr.disabled]="disabled ? true : ( context ? (context.invalid ? true : null) : null )" (click)="openModal()">
+  </sb-caret-down>
+  <div class="list-border" (click)="openModal()">
+    <ul [attr.disabled]="disabled ? true : ( context ? (context.invalid ? true : null) : null )">
+      <li *ngIf="!showValues || !this.values.size" class="placeholder">{{placeHolder}}</li>
+      <section class="value-label" *ngIf="showValues">
+        {{valuesLabel}}
+      </section>
+    </ul>
+  </div>
+  <div class="sb-modal-container" [hidden]="!showModal">
+    <div class="sb-modal-overlay">
+      <div class="sb-modal">
+        <div class="header">
+          {{placeHolder}}
+        </div>
+        <div class="body">
+          <ul>
+            <ng-container *ngIf="optionsType === 'ARRAY'">
+              <li *ngFor="let option of options; let i=index">
+                <div class="row" (click)="addSelected(option)">
+                  <label class="container">
+                    <input [checked]="values.has(option)" type="checkbox" (click)="addSelected(option)" class="sb-checkbox">
+                    <span class="checkmark"></span>
+                  </label>
+                  <span>{{option.label}}</span>
+                </div>
+              </li>
+            </ng-container>
+            <ng-container *ngIf="optionsType === 'CLOSURE'">
+              <ng-container *ngIf="(options$ | async) as optionsList">
+                <li *ngFor="let option of optionsList; let i=index">
+                  <div class="row" (click)="addSelected(option)">
+                    <label class="container">
+                      <input [checked]="values.has(option)" type="checkbox" class="sb-checkbox">
+                      <span class="checkmark"></span>
+                    </label>
+                    <span>{{option.label}}</span>
+                  </div>
+                </li>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="optionsType === 'MAP' && this.context && this.context.value">
+              <li *ngFor="let option of options[context.value]; let i=index">
+                <div class="row" (click)="addSelected(option)">
+                  <label class="container">
+                    <input [checked]="values.has(option)" type="checkbox" class="sb-checkbox">
+                    <span class="checkmark"></span>
+                  </label>
+                  <span>{{option.label}}</span>
+                </div>
+              </li>
+            </ng-container>
+          </ul>
+        </div>
+        <div class="footer">
+          <div class="sb-form-button">
+            <button class="sb-btn-primary-outline" (click)="onCancel()">cancel</button>
+          </div>
+          <div class="sb-form-button">
+            <button class="sb-btn-primary" (click)="onSubmit()">submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

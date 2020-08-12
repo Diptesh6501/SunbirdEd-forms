@@ -41,6 +41,7 @@ export class MultipleDropdownComponent implements OnInit, OnChanges {
         })
       ).subscribe();
     }
+    this.getDefaultValues();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

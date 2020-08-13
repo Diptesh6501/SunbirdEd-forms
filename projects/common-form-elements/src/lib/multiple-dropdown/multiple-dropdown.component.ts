@@ -75,7 +75,13 @@ export class MultipleDropdownComponent implements OnInit, OnChanges {
         this.values.add(ele);
       });
     } else if (this.default) {
-      this.values.add(this.default);
+      this.options.forEach(ele => {
+        if (ele.value === this.default) {
+          this.values.add(ele);
+        }
+      });
+      this.valuesLabel = this.values.values().next().value.label;
+      this.showValues = true;
     }
   }
 

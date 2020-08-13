@@ -4,6 +4,9 @@
             <input type="checkbox" [formControl]="formControlRef" name="checkbox" value="value">
             <span class="checkmark"></span>
         </label>
-        <label class="checkbox-label">{{label}}</label>
+        <label *ngIf="label" class="checkbox-label">{{label}}</label>
+        <label class="label-html" *ngIf="labelHtml">
+            <div [innerHTML]="labelHtml | translateHtml" (click)="handleLinkClick($event)"></div>
+        </label>
     </div>
 </div>

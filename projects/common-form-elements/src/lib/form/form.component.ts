@@ -21,18 +21,16 @@ import {distinctUntilChanged, map, scan, tap} from 'rxjs/operators';
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.css']
 })
-export class FormComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+export class FormComponent implements OnInit, OnChanges, OnDestroy {
   @Output() initialize = new EventEmitter();
   @Output() finalize = new EventEmitter();
-
+  @Output() linkClicked = new EventEmitter();
   @Output() valueChanges = new EventEmitter();
   @Output() statusChanges = new EventEmitter();
   @Output() dataLoadStatus = new EventEmitter<'LOADING' | 'LOADED'>();
   @Input() config;
   @Input() dataLoadStatusDelegate = new Subject<'LOADING' | 'LOADED'>();
   @Input() asyncValidatorFactory?: AsyncValidatorFactory;
-
-  @ViewChildren('validationTrigger') validationTriggers: QueryList<HTMLElement>;
 
   formGroup: FormGroup;
 
@@ -116,7 +114,7 @@ export class FormComponent implements OnInit, OnChanges, OnDestroy, AfterViewIni
       })
     ).subscribe();
 
-    this.statusChangesSubscription = this.formGroup.valueChanges.pipe(
+    this.statusChangesSubscription = this.formGroup.statusChanges.pipe(
       tap((v) => {
         this.statusChanges.emit({
           isPristine: this.formGroup.pristine,
@@ -132,17 +130,6 @@ export class FormComponent implements OnInit, OnChanges, OnDestroy, AfterViewIni
         this.valueChanges.emit(v);
       })
     ).subscribe();
-  }
-
-  ngAfterViewInit() {
-    this.config.forEach(element => {
-      if (element.asyncValidation && element.asyncValidation.asyncValidatorFactory) {
-        this.formGroup.get(element.code).setAsyncValidators(element.asyncValidation.asyncValidatorFactory(
-          element.asyncValidation.marker,
-          this.validationTriggers
-        ));
-      }
-    });
   }
 
   onNestedFormFinalize(nestedFormGroup: FormGroup, fieldConfig: FieldConfig<any>) {
@@ -239,5 +226,9 @@ export class FormComponent implements OnInit, OnChanges, OnDestroy, AfterViewIni
     formValueList.push(Validators.compose(validationList));
 
     return formValueList;
+  }
+
+  clickedLink(event) {
+    this.linkClicked.emit(event);
   }
 }

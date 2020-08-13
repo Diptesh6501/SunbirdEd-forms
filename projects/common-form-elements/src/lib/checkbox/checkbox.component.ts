@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 @Component({
@@ -11,10 +11,20 @@ export class CheckboxComponent implements OnInit {
   @Input() code: any;
   @Input() value?: any;
   @Input() formControlRef?: FormControl;
+  @Input() labelHtml?: any;
+  @Output() clickedLink = new EventEmitter();
 
   constructor() { }
 
   ngOnInit() {
+    console.log('label', this.label);
+    console.log('labelHtml', this.labelHtml);
+  }
+
+  handleLinkClick(event: MouseEvent) {
+    if (event.target && event.target['hasAttribute'] && (event.target as HTMLAnchorElement).hasAttribute('href')) {
+      this.clickedLink.emit((event.target as HTMLAnchorElement).getAttribute('href'));
+    }
   }
 
 }

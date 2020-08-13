@@ -72,6 +72,10 @@ label {
 
 .checkbox-row {
     display: grid;
-    grid-template-columns: 10px 250px;
+    grid-template-columns: 10% 90%;
     grid-gap: 0rem;
+}
+
+.label-html{
+    font-size: 14px;
 }

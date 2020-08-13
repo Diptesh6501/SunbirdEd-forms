@@ -1,12 +1,16 @@
-import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {from, Subject} from 'rxjs';
-import {FieldConfigOption, FieldConfigOptionsBuilder} from '../common-form-config';
+import {FieldConfigOptionsBuilder} from '../common-form-config';
 import {takeUntil, tap} from 'rxjs/operators';
+import {fromJS, List, Map, Set} from 'immutable';
+
+
 @Component({
   selector: 'sb-multiple-dropdown',
   templateUrl: './multiple-dropdown.component.html',
-  styleUrls: ['./multiple-dropdown.component.css']
+  styleUrls: ['./multiple-dropdown.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
   @Input() disabled?: boolean;
@@ -20,11 +24,17 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
   @Input() contextData: any;
   @Input() dataLoadStatusDelegate: Subject<'LOADING' | 'LOADED'>;
   showModal = false;
-  tempValue: any;
-  resolvedOptions: FieldConfigOption<any>[] = [];
-  optionValueToOptionLabelMap = new Map();
+  tempValue = Set<any>();
+  resolvedOptions = List<Map<string, string>>();
+  optionValueToOptionLabelMap = Map<any, string>();
+
+  fromJS = fromJS;
+
   private dispose$ = new Subject<undefined>();
-  constructor() {
+
+  constructor(
+    private changeDetectionRef: ChangeDetectorRef
+  ) {
   }
   ngOnInit() {
     if (this.context) {
@@ -41,61 +51,40 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
     if (!changes['options'] || !changes['options'].currentValue) {
       return;
     }
+
     this.setupOptions();
   }
-  private setupOptions() {
-    if (!this.options) {
-      this.options = [];
-    }
-    if (this.isOptionsArray()) {
-      this.resolvedOptions = this.options;
-    } else if (this.isOptionsMap()) {
-      this.resolvedOptions = (this.context && this.context.value)  ? this.options[this.context.value] : this.context.value;
-    } else if (this.isOptionsClosure()) {
-      from((this.options as FieldConfigOptionsBuilder<any>)(
-        this.formControlRef,
-        this.context,
-        () => this.dataLoadStatusDelegate.next('LOADING'),
-        () => this.dataLoadStatusDelegate.next('LOADED')
-      )).pipe(
-        tap((options) => this.resolvedOptions = options),
-        takeUntil(this.dispose$)
-      ).subscribe();
-    }
-    this.resolvedOptions.forEach((option) => {
-      this.optionValueToOptionLabelMap.set(option.value, option.label);
-    });
-    this.tempValue = this.default ? this.default : this.tempValue;
+
+  onSubmit() {
+    const finalValue = this.tempValue.toList().toJS();
+    this.formControlRef.patchValue(this.isMultiple ? finalValue : finalValue[0]);
+    this.formControlRef.markAsDirty();
+    this.showModal = false;
   }
   openModal() {
     this.showModal = true;
   }
-  onSubmit() {
-    this.formControlRef.patchValue(this.tempValue);
-    this.formControlRef.markAsDirty();
-    this.showModal = !this.showModal;
+
+  addSelected(option: Map<string, string>) {
+    if (this.isMultiple) {
+      if (this.tempValue.includes(option.get('value'))) {
+        this.tempValue = this.tempValue.remove(option.get('value'));
+      } else {
+        this.tempValue = this.tempValue.add(option.get('value'));
+      }
+    } else {
+      this.tempValue = this.tempValue.clear();
+      this.tempValue = this.tempValue.add(option.get('value'));
+    }
   }
   onCancel() {
     this.formControlRef.markAsDirty();
     this.showModal = false;
   }
-  addSelected(option: FieldConfigOption<any>) {
-    if (this.isMultiple) {
-      if (Array.isArray(this.tempValue)) {
-        if (this.tempValue.includes(option.value)) {
-          this.tempValue = this.tempValue.splice(this.tempValue.indexOf(option.value), 1);
-        } else {
-          this.tempValue = [
-            ...this.tempValue,
-            option.value
-          ];
-        }
-      } else {
-        this.tempValue = [option.value];
-      }
-    } else {
-      this.tempValue = option.value;
-    }
+
+  ngOnDestroy(): void {
+    this.dispose$.next(null);
+    this.dispose$.complete();
   }
   private isOptionsArray() {
     return Array.isArray(this.options);
@@ -106,8 +95,49 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
   private isOptionsMap() {
     return !Array.isArray(this.options) && typeof this.options === 'object';
   }
-  ngOnDestroy(): void {
-    this.dispose$.next(null);
-    this.dispose$.complete();
+
+  private setupOptions() {
+    if (!this.options) {
+      this.options = [];
+      this.resolvedOptions = this.resolvedOptions.clear();
+    }
+
+    if (this.isOptionsArray()) {
+      this.resolvedOptions = fromJS(this.options);
+    } else if (this.isOptionsMap()) {
+      this.resolvedOptions = (this.context && this.context.value) ?
+        fromJS(this.options[this.context.value]) :
+        fromJS(this.context.value);
+    } else if (this.isOptionsClosure()) {
+      from((this.options as FieldConfigOptionsBuilder<any>)(
+        this.formControlRef,
+        this.context,
+        () => this.dataLoadStatusDelegate.next('LOADING'),
+        () => this.dataLoadStatusDelegate.next('LOADED')
+      )).pipe(
+        tap((options = []) => {
+          this.resolvedOptions = fromJS(options);
+
+          this.resolvedOptions.forEach((option) => {
+            this.optionValueToOptionLabelMap = this.optionValueToOptionLabelMap.set(option.get('value'), option.get('label'));
+          });
+
+          this.changeDetectionRef.detectChanges();
+        }),
+        takeUntil(this.dispose$)
+      ).subscribe();
+    }
+
+    this.resolvedOptions.forEach((option) => {
+      this.optionValueToOptionLabelMap = this.optionValueToOptionLabelMap.set(option.get('value'), option.get('label'));
+    });
+
+    if (this.default) {
+      if (Array.isArray(this.default)) {
+        this.tempValue = Set(fromJS(this.default));
+      }
+
+      this.tempValue = Set(fromJS(this.default));
+    }
   }
 }

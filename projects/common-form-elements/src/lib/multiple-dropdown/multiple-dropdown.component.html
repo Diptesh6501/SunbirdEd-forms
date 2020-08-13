@@ -7,15 +7,19 @@
     <ul [attr.disabled]="disabled ? true : ( context ? (context.invalid ? true : null) : null )">
       <ng-container *ngIf="isMultiple">
         <li *ngIf="!formControlRef.value || !formControlRef.value.length" class="placeholder">{{placeHolder}}</li>
+
         <ng-container *ngIf="formControlRef.value?.length">
           <span *ngFor="let value of formControlRef.value; let index=index">
-            {{optionValueToOptionLabelMap.get(value)}}<span *ngIf="index < formControlRef.value.length">, </span>
+            {{optionValueToOptionLabelMap.get(fromJS(value))}}<span
+            *ngIf="index < formControlRef.value.length - 1">, </span>
           </span>
         </ng-container>
       </ng-container>
+
       <ng-container *ngIf="!isMultiple">
         <li *ngIf="!formControlRef.value" class="placeholder">{{placeHolder}}</li>
-        <span *ngIf="formControlRef.value">{{optionValueToOptionLabelMap.get(formControlRef.value)}}</span>
+
+        <span *ngIf="formControlRef.value">{{optionValueToOptionLabelMap.get(fromJS(formControlRef.value))}}</span>
       </ng-container>
     </ul>
   </div>
@@ -28,12 +32,12 @@
         <div class="body">
           <ul>
             <li *ngFor="let option of resolvedOptions; let i=index">
-              <div class="row" (click)="addSelected(option)">
+              <div (click)="addSelected(option)" class="row">
                 <label class="container">
-                  <input [checked]="isMultiple ? tempValue?.includes(option.value) : tempValue === option.value" type="checkbox" class="sb-checkbox">
+                  <input [checked]="tempValue.includes(option.get('value'))" class="sb-checkbox" type="checkbox">
                   <span class="checkmark"></span>
                 </label>
-                <span>{{option.label}}</span>
+                <span>{{option.get('label')}}</span>
               </div>
             </li>
           </ul>

@@ -50,7 +50,8 @@ import { EmptyCircleComponent } from './icon/empty-circle/empty-circle.component
       DropdownIconComponent,
       RedExclamationComponent,
       GreenTickComponent,
-      EmptyCircleComponent
+      EmptyCircleComponent,
+      MultipleDropdownComponent
    ]
 })
 export class CommonFormElementsModule { }

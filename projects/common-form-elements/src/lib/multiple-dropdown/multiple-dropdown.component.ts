@@ -1,8 +1,8 @@
-import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
-import {FormControl} from '@angular/forms';
-import {Observable, Subject, Subscription} from 'rxjs';
-import {FieldConfigOption, FieldConfigOptionsBuilder} from '../common-form-config';
-import {tap} from 'rxjs/operators';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { FieldConfigOption, FieldConfigOptionsBuilder } from '../common-form-config';
+import { tap } from 'rxjs/operators';
 
 
 @Component({
@@ -41,7 +41,6 @@ export class MultipleDropdownComponent implements OnInit, OnChanges {
         })
       ).subscribe();
     }
-    this.getDefaultValues();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

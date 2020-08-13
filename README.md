@@ -1,27 +1,21 @@
 # SunbirdEdForms
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.0.
+Contains  Form component powered by angular. This component expects a configuration and renders form according to the view.
 
-## Development server
+# Getting Started
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Step 1: Install the package
 
-## Code scaffolding
+    npm install common-form-elements --save
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Step 2: Include the library selector in view( Eg .HTML file)
+   
+   <sb-form [config]='config'></sb-form>
 
-## Build
+## step3: Form component emits values on every input , To get value include event callbacks
+ 
+  <sb-form (valueChanges)="function($event)" (statusChanges)="function($event)" ></sb-form>
+   
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+    
+ 

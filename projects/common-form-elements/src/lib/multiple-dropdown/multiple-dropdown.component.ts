@@ -46,6 +46,18 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
         takeUntil(this.dispose$)
       ).subscribe();
     }
+
+    this.formControlRef.valueChanges.pipe(
+      tap((value) => {
+        if (Array.isArray(value)) {
+          this.tempValue = Set(fromJS(value));
+        } else {
+          this.tempValue = Set(fromJS([value]));
+        }
+        this.changeDetectionRef.detectChanges();
+      }),
+      takeUntil(this.dispose$)
+    ).subscribe();
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (!changes['options'] || !changes['options'].currentValue) {
@@ -122,6 +134,14 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
             this.optionValueToOptionLabelMap = this.optionValueToOptionLabelMap.set(option.get('value'), option.get('label'));
           });
 
+          if (this.default) {
+            if (Array.isArray(this.default)) {
+              this.tempValue = Set(fromJS(this.default));
+            } else {
+              this.tempValue = Set(fromJS([this.default]));
+            }
+          }
+
           this.changeDetectionRef.detectChanges();
         }),
         takeUntil(this.dispose$)
@@ -135,9 +155,9 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
     if (this.default) {
       if (Array.isArray(this.default)) {
         this.tempValue = Set(fromJS(this.default));
+      } else {
+        this.tempValue = Set(fromJS([this.default]));
       }
-
-      this.tempValue = Set(fromJS(this.default));
     }
   }
 }

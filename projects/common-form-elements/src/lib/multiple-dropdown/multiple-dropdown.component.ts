@@ -1,17 +1,18 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { FieldConfigOption, FieldConfigOptionsBuilder } from '../common-form-config';
-import { tap } from 'rxjs/operators';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {from, Subject} from 'rxjs';
+import {FieldConfigOptionsBuilder} from '../common-form-config';
+import {takeUntil, tap} from 'rxjs/operators';
+import {fromJS, List, Map, Set} from 'immutable';
 
 
 @Component({
   selector: 'sb-multiple-dropdown',
   templateUrl: './multiple-dropdown.component.html',
-  styleUrls: ['./multiple-dropdown.component.css']
+  styleUrls: ['./multiple-dropdown.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MultipleDropdownComponent implements OnInit, OnChanges {
-
+export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
   @Input() disabled?: boolean;
   @Input() options: any;
   @Input() label?: string;
@@ -22,23 +23,28 @@ export class MultipleDropdownComponent implements OnInit, OnChanges {
   @Input() default?: any;
   @Input() contextData: any;
   @Input() dataLoadStatusDelegate: Subject<'LOADING' | 'LOADED'>;
-  values = new Set<FieldConfigOption<any>>();
   showModal = false;
-  showValues = false;
-  valuesLabel = '';
-  options$?: Observable<FieldConfigOption<any>[]>;
-  contextValueChangesSubscription?: Subscription;
-  optionsType: 'ARRAY' | 'CLOSURE' | 'MAP';
+  tempValue = Set<any>();
+  resolvedOptions = List<Map<string, string>>();
+  optionValueToOptionLabelMap = Map<any, string>();
 
-  constructor() {
+  fromJS = fromJS;
+
+  private dispose$ = new Subject<undefined>();
+
+  constructor(
+    private changeDetectionRef: ChangeDetectorRef
+  ) {
   }
 
   ngOnInit() {
     if (this.context) {
-      this.contextValueChangesSubscription = this.context.valueChanges.pipe(
+      this.context.valueChanges.pipe(
         tap(() => {
           this.formControlRef.patchValue(null);
-        })
+          this.setupOptions();
+        }),
+        takeUntil(this.dispose$)
       ).subscribe();
     }
   }
@@ -48,80 +54,41 @@ export class MultipleDropdownComponent implements OnInit, OnChanges {
       return;
     }
 
-    if (!this.options) {
-      this.options = [];
-    }
-
-    if (this.isOptionsArray()) {
-      this.optionsType = 'ARRAY';
-    } else if (this.isOptionsMap()) {
-      this.optionsType = 'MAP';
-    } else if (this.isOptionsClosure()) {
-      this.optionsType = 'CLOSURE';
-
-      this.options$ = (this.options as FieldConfigOptionsBuilder<any>)(
-        this.formControlRef,
-        this.context,
-        () => this.dataLoadStatusDelegate.next('LOADING'),
-        () => this.dataLoadStatusDelegate.next('LOADED')
-      ) as any;
-    }
+    this.setupOptions();
   }
 
-  getDefaultValues() {
-    if (Array.isArray(this.default) && this.isMultiple) {
-      this.default.forEach((ele) => {
-        this.values.add(ele);
-      });
-    } else if (this.default) {
-      this.options.forEach(ele => {
-        if (ele.value === this.default) {
-          this.values.add(ele);
-        }
-      });
-      this.valuesLabel = this.values.values().next().value.label;
-      this.showValues = true;
-    }
+  onSubmit() {
+    const finalValue = this.tempValue.toList().toJS();
+    this.formControlRef.patchValue(this.isMultiple ? finalValue : finalValue[0]);
+    this.formControlRef.markAsDirty();
+    this.showModal = false;
   }
 
   openModal() {
     this.showModal = true;
-    this.showValues = false;
   }
 
-  async addSelected(option: FieldConfigOption<any>) {
-    if (this.values.has(option)) {
-      this.values.delete(option);
-    } else {
-      if (!this.isMultiple) {
-        this.values.clear();
-      }
-      this.values.add(option);
-    }
-    this.valuesLabel = Array.from(this.values).map((v) => v.label).join(', ');
-  }
-
-  onSubmit() {
+  addSelected(option: Map<string, string>) {
     if (this.isMultiple) {
-      this.formControlRef.patchValue(Array.from(this.values).map((v) => v.value));
+      if (this.tempValue.includes(option.get('value'))) {
+        this.tempValue = this.tempValue.remove(option.get('value'));
+      } else {
+        this.tempValue = this.tempValue.add(option.get('value'));
+      }
     } else {
-      this.formControlRef.patchValue((Array.from(this.values)[0] && Array.from(this.values)[0].value) || null);
+      this.tempValue = this.tempValue.clear();
+      this.tempValue = this.tempValue.add(option.get('value'));
     }
-    this.showModal = !this.showModal;
-    this.showValues = true;
-    this.formControlRef.markAsDirty();
   }
 
   onCancel() {
-    this.values.clear();
-    if (this.isMultiple) {
-      this.formControlRef.patchValue([]);
-    } else {
-      this.formControlRef.patchValue(null);
-    }
     this.formControlRef.markAsDirty();
     this.showModal = false;
-    this.showValues = false;
+  }
+
+  ngOnDestroy(): void {
+    this.dispose$.next(null);
+    this.dispose$.complete();
   }
 
   private isOptionsArray() {
@@ -134,5 +101,50 @@ export class MultipleDropdownComponent implements OnInit, OnChanges {
 
   private isOptionsMap() {
     return !Array.isArray(this.options) && typeof this.options === 'object';
+  }
+
+  private setupOptions() {
+    if (!this.options) {
+      this.options = [];
+      this.resolvedOptions = this.resolvedOptions.clear();
+    }
+
+    if (this.isOptionsArray()) {
+      this.resolvedOptions = fromJS(this.options);
+    } else if (this.isOptionsMap()) {
+      this.resolvedOptions = (this.context && this.context.value) ?
+        fromJS(this.options[this.context.value]) :
+        fromJS(this.context.value);
+    } else if (this.isOptionsClosure()) {
+      from((this.options as FieldConfigOptionsBuilder<any>)(
+        this.formControlRef,
+        this.context,
+        () => this.dataLoadStatusDelegate.next('LOADING'),
+        () => this.dataLoadStatusDelegate.next('LOADED')
+      )).pipe(
+        tap((options = []) => {
+          this.resolvedOptions = fromJS(options);
+
+          this.resolvedOptions.forEach((option) => {
+            this.optionValueToOptionLabelMap = this.optionValueToOptionLabelMap.set(option.get('value'), option.get('label'));
+          });
+
+          this.changeDetectionRef.detectChanges();
+        }),
+        takeUntil(this.dispose$)
+      ).subscribe();
+    }
+
+    this.resolvedOptions.forEach((option) => {
+      this.optionValueToOptionLabelMap = this.optionValueToOptionLabelMap.set(option.get('value'), option.get('label'));
+    });
+
+    if (this.default) {
+      if (Array.isArray(this.default)) {
+        this.tempValue = Set(fromJS(this.default));
+      }
+
+      this.tempValue = Set(fromJS(this.default));
+    }
   }
 }

@@ -114,7 +114,7 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
     } else if (this.isOptionsMap()) {
       this.resolvedOptions = (this.context && this.context.value) ?
         fromJS(this.options[this.context.value]) :
-        fromJS(this.context.value);
+        this.resolvedOptions;
     } else if (this.isOptionsClosure()) {
       from((this.options as FieldConfigOptionsBuilder<any>)(
         this.formControlRef,

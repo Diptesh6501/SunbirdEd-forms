@@ -33,7 +33,7 @@
           <ul>
             <li *ngFor="let option of resolvedOptions; let i=index">
               <div (click)="addSelected(option)" class="row">
-                <label class="container">
+                <label class="container" style="pointer-events: none">
                   <input [checked]="tempValue.includes(option.get('value'))" class="sb-checkbox" type="checkbox">
                   <span class="checkmark"></span>
                 </label>

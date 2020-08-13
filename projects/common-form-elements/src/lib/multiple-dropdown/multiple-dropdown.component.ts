@@ -47,6 +47,18 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
         takeUntil(this.dispose$)
       ).subscribe();
     }
+
+    this.formControlRef.valueChanges.pipe(
+      tap((value) => {
+        if (Array.isArray(value)) {
+          this.tempValue = Set(fromJS(value));
+        } else {
+          this.tempValue = Set(fromJS([value]));
+        }
+        this.changeDetectionRef.detectChanges();
+      }),
+      takeUntil(this.dispose$)
+    ).subscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

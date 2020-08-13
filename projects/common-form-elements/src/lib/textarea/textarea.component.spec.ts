@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TextareaComponent } from './textarea.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('TextareaComponent', () => {
   let component: TextareaComponent;
@@ -8,9 +9,10 @@ describe('TextareaComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TextareaComponent ]
+      declarations: [TextareaComponent],
+      schemas: [NO_ERRORS_SCHEMA]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -21,5 +23,9 @@ describe('TextareaComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('ngOnInit', () => {
+
   });
 });

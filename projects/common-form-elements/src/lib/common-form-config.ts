@@ -1,6 +1,5 @@
 import {Observable} from 'rxjs';
 import {AsyncValidatorFn, FormControl} from '@angular/forms';
-import {QueryList} from '@angular/core';
 
 export enum FieldConfigInputType {
   INPUT = 'input',
@@ -10,7 +9,7 @@ export enum FieldConfigInputType {
   TEXTAREA = 'textarea',
   NESTED_SELECT = 'nested_select',
   NESTED_GROUP = 'nested_group',
-  MULTIPLE_SELECT= 'multiple_select'
+  MULTIPLE_SELECT = 'multiple_select'
 }
 
 export enum FieldConfigValidationType {
@@ -22,8 +21,10 @@ export enum FieldConfigValidationType {
 }
 
 export type FieldConfigOptionsBuilder<T> =
-  (control: FormControl, context?: FormControl, notifyLoading?: () => void, notifyLoaded?: () => void) => Observable<FieldConfigOption<T>[]> | Promise<FieldConfigOption<T>[]>;
-export type AsyncValidatorFactory = (marker: string, triggers: QueryList<HTMLElement>) => AsyncValidatorFn;
+  (control: FormControl, context?: FormControl, notifyLoading?: () => void,
+    notifyLoaded?: () => void) => Observable<FieldConfigOption<T>[]> | Promise<FieldConfigOption<T>[]>;
+export type AsyncValidatorFactory = (marker: string, trigger: HTMLElement) => AsyncValidatorFn;
+
 export interface FieldConfigOption<T> {
   label: string;
   value: T;
@@ -32,12 +33,19 @@ export interface FieldConfigOption<T> {
 export interface FieldConfigOptionAssociations<T> {
   [key: string]: FieldConfigOption<T>[];
 }
+export interface FieldConfigAsyncValidation {
+  marker: string;
+  message?: string;
+  trigger?: string;
+  asyncValidatorFactory?: AsyncValidatorFactory;
+}
 export interface FieldConfig<T> {
   code: string;
   type: FieldConfigInputType;
+  fieldName?: string;
   default?: any;
   context?: string;
-  children?: { [key: string]: FieldConfig<T>[] };
+  children?: { [key: string]: FieldConfig<T>[] } | FieldConfig<T>[];
   templateOptions: {
     type?: string,
     label?: string,
@@ -57,5 +65,5 @@ export interface FieldConfig<T> {
     value?: string | boolean | number | RegExp,
     message?: string
   }[];
-  asyncValidation?: { marker: string, trigger?: string };
+  asyncValidation?: FieldConfigAsyncValidation;
 }

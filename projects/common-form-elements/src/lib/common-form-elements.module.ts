@@ -11,14 +11,46 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DropdownIconComponent } from './icon/dropdown/dropdownIcon.component';
 import { MultipleDropdownComponent } from './multiple-dropdown/multiple-dropdown.component';
 import { CaretDownComponent } from './icon/caret-down/caret-down.component';
+import { PipesModule } from './pipes/pipes.module';
+import { RedExclamationComponent } from './icon/red-exclamation/red-exclamation.component';
+import { GreenTickComponent } from './icon/green-tick/green-tick.component';
+import { EmptyCircleComponent } from './icon/empty-circle/empty-circle.component';
 
 @NgModule({
-   declarations: [CommonFormElementsComponent, DropdownComponent, TextboxComponent,
-      TextareaComponent, CheckboxComponent, FormComponent,
-      OptionGroupComponent, DropdownIconComponent, MultipleDropdownComponent, CaretDownComponent],
-   imports: [CommonModule, ReactiveFormsModule, FormsModule
+   declarations: [
+      CommonFormElementsComponent,
+      DropdownComponent,
+      TextboxComponent,
+      TextareaComponent,
+      CheckboxComponent,
+      FormComponent,
+      OptionGroupComponent,
+      DropdownIconComponent,
+      MultipleDropdownComponent,
+      CaretDownComponent,
+      RedExclamationComponent,
+      GreenTickComponent,
+      EmptyCircleComponent
    ],
-   exports: [CommonFormElementsComponent, DropdownComponent, CaretDownComponent,
-      TextboxComponent, TextareaComponent, CheckboxComponent, FormComponent, OptionGroupComponent, DropdownIconComponent]
+   imports: [
+      CommonModule,
+      ReactiveFormsModule,
+      FormsModule,
+      PipesModule
+   ],
+   exports: [
+      CommonFormElementsComponent,
+      DropdownComponent,
+      CaretDownComponent,
+      TextboxComponent,
+      TextareaComponent,
+      CheckboxComponent,
+      FormComponent,
+      OptionGroupComponent,
+      DropdownIconComponent,
+      RedExclamationComponent,
+      GreenTickComponent,
+      EmptyCircleComponent
+   ]
 })
 export class CommonFormElementsModule { }

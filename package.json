@@ -1,6 +1,6 @@
 {
-  "name": "sunbird-ed-forms",
-  "version": "0.0.0",
+  "name": "common-form-elements",
+  "version": "0.0.8",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -9,7 +9,6 @@
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "~7.1.0",
     "@angular/common": "~7.1.0",
@@ -19,6 +18,7 @@
     "@angular/platform-browser": "~7.1.0",
     "@angular/platform-browser-dynamic": "~7.1.0",
     "@angular/router": "~7.1.0",
+    "common-consumption-styles": "0.0.17",
     "core-js": "^2.5.4",
     "rxjs": "^6.3.3",
     "tslib": "^1.9.0",

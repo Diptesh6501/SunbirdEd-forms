@@ -1,9 +1,6 @@
 {
   "name": "common-form-elements",
   "version": "0.0.1",
-  "dependencies": {
-    "immutable": "^4.0.0-rc.12"
-  },
   "peerDependencies": {
     "@angular/common": "^7.1.0",
     "@angular/core": "^7.1.0",

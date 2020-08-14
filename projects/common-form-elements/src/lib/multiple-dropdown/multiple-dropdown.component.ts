@@ -36,7 +36,6 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
     private changeDetectionRef: ChangeDetectorRef
   ) {
   }
-
   ngOnInit() {
     if (this.context) {
       this.context.valueChanges.pipe(
@@ -48,7 +47,6 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
       ).subscribe();
     }
   }
-
   ngOnChanges(changes: SimpleChanges): void {
     if (!changes['options'] || !changes['options'].currentValue) {
       return;
@@ -63,7 +61,6 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
     this.formControlRef.markAsDirty();
     this.showModal = false;
   }
-
   openModal() {
     this.showModal = true;
   }
@@ -80,7 +77,6 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
       this.tempValue = this.tempValue.add(option.get('value'));
     }
   }
-
   onCancel() {
     this.formControlRef.markAsDirty();
     this.showModal = false;
@@ -90,15 +86,12 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
     this.dispose$.next(null);
     this.dispose$.complete();
   }
-
   private isOptionsArray() {
     return Array.isArray(this.options);
   }
-
   private isOptionsClosure() {
     return typeof this.options === 'function';
   }
-
   private isOptionsMap() {
     return !Array.isArray(this.options) && typeof this.options === 'object';
   }

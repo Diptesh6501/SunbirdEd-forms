@@ -74,6 +74,9 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
     this.showModal = false;
   }
   openModal() {
+    if (this.context && this.context.invalid) {
+      return;
+    }
     this.showModal = true;
   }
 

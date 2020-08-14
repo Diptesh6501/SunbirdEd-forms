@@ -1,5 +1,5 @@
 <div class="sb-input">
-  <label>{{label}}</label>
+  <label class="input-label" *ngIf="label">{{label}}</label>
 
   <div [ngClass]="{'async-text': (asyncValidation && asyncValidation?.trigger), '': (!asyncValidation || !asyncValidation?.trigger)}">
     <input [formControl]="formControlRef" class="sb-textbox" placeholder={{placeholder}} type="text">
@@ -8,7 +8,6 @@
       <sb-red-exclamation *ngIf="formControlRef.value && formControlRef.status !== 'VALID'"></sb-red-exclamation>
       <sb-empty-circle *ngIf="!formControlRef.value"></sb-empty-circle>
     </div>
-
   </div>
   
   <ng-container *ngFor="let validation of validations">
@@ -17,18 +16,19 @@
       {{ validation.message }}
     </div>
   </ng-container>
-</div>
+  
+  <ng-container *ngIf="asyncValidation?.trigger">
+    <div class="async-validator"
+      [hidden]="formControlRef.status === 'VALID' || formControlRef.status !== 'PENDING' || !formControlRef.value">
+      <div class="cf-error" *ngIf="asyncValidation?.message">
+        {{ asyncValidation.message }}
+      </div>
+      <div class="async-container">
+        <button class="async-btn" #validationTrigger [attr.data-marker]="asyncValidation.marker">
+          {{asyncValidation.trigger}}
+        </button>
+      </div>
+    </div>
+  </ng-container>
 
-<ng-container *ngIf="asyncValidation?.trigger">
-  <div class="async-validator"
-    [hidden]="formControlRef.status === 'VALID' || formControlRef.status !== 'PENDING' || !formControlRef.value">
-    <div class="cf-error" *ngIf="asyncValidation?.message">
-      {{ asyncValidation.message }}
-    </div>
-    <div class="async-container">
-      <button class="async-btn" #validationTrigger [attr.data-marker]="asyncValidation.marker">
-        {{asyncValidation.trigger}}
-      </button>
-    </div>
-  </div>
-</ng-container>
+</div>

@@ -55,8 +55,8 @@
     </ng-container>
 
     <ng-container *ngIf="field.type === FieldConfigInputType.LABEL">
-      <label>{{field.templateOptions?.label}}</label>
-      <div [innerHTML]="field.templateOptions?.labelHtml | translateHtml"></div>
+      <label *ngIf="field.templateOptions?.label">{{field.templateOptions?.label}}</label>
+      <div *ngIf="field.templateOptions?.labelHtml" [innerHTML]="field.templateOptions?.labelHtml | translateHtml"></div>
     </ng-container>
     
   </ng-container>

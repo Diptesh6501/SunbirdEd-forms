@@ -114,10 +114,12 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private setTempValue(value: any) {
-    if (Array.isArray(value)) {
-      this.tempValue = Set(fromJS(value));
-    } else {
-      this.tempValue = Set(fromJS([value]));
+    if (value) {
+      if (Array.isArray(value)) {
+        this.tempValue = Set(fromJS(value));
+      } else {
+        this.tempValue = Set(fromJS([value]));
+      }
     }
   }
 
@@ -147,9 +149,7 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
             this.optionValueToOptionLabelMap = this.optionValueToOptionLabelMap.set(option.get('value'), option.get('label'));
           });
 
-          if (this.default) {
-            this.setTempValue(this.default);
-          }
+          this.setTempValue(this.default);
 
           this.changeDetectionRef.detectChanges();
         }),
@@ -161,8 +161,6 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
       this.optionValueToOptionLabelMap = this.optionValueToOptionLabelMap.set(option.get('value'), option.get('label'));
     });
 
-    if (this.default) {
-      this.setTempValue(this.default);
-    }
+    this.setTempValue(this.default);
   }
 }

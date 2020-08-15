@@ -1,10 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe(
-    { name: 'translateHtml' }
+    { name: 'transposeHtml' }
 )
 
-export class TranslateHtmlPipe implements PipeTransform {
+export class TransposeHtmlPipe implements PipeTransform {
 
   constructor() {}
 

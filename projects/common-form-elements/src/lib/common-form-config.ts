@@ -57,7 +57,7 @@ export interface FieldConfig<T> {
     options?: FieldConfigOption<T>[] | FieldConfigOptionsBuilder<T> | FieldConfigOptionAssociations<T>,
     labelHtml?: {
       contents: string,
-      values: { [key: string]: string }
+      values?: { [key: string]: string }
     }
   };
   validations?: {

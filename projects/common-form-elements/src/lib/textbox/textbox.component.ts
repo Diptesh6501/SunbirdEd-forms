@@ -10,9 +10,11 @@ import { FieldConfigAsyncValidation } from '../common-form-config';
 export class TextboxComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() asyncValidation?: FieldConfigAsyncValidation;
   @Input() label: String;
+  @Input() labelHtml: any;
   @Input() placeholder: String;
   @Input() validations?: any;
   @Input() formControlRef?: FormControl;
+  @Input() prefix?: String;
   @ViewChild('validationTrigger') validationTrigger: ElementRef;
 
   constructor() {

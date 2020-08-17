@@ -1,12 +1,12 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { TranslateHtmlPipe } from './translate-html/translate-html';
+import { TransposeHtmlPipe } from './transpose-html/transpose-html';
 
 @NgModule({
-  declarations: [TranslateHtmlPipe],
+  declarations: [TransposeHtmlPipe],
   imports: [CommonModule],
-  exports: [TranslateHtmlPipe],
+  exports: [TransposeHtmlPipe],
   providers: [DatePipe]
 })
 export class PipesModule {

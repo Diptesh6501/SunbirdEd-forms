@@ -16,6 +16,7 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
   @Input() disabled?: boolean;
   @Input() options: any;
   @Input() label?: string;
+  @Input() labelHtml: any;
   @Input() placeHolder?: string;
   @Input() isMultiple?: boolean;
   @Input() context?: FormControl;
@@ -49,11 +50,7 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
 
     this.formControlRef.valueChanges.pipe(
       tap((value) => {
-        if (Array.isArray(value)) {
-          this.tempValue = Set(fromJS(value));
-        } else {
-          this.tempValue = Set(fromJS([value]));
-        }
+        this.setTempValue(value);
         this.changeDetectionRef.detectChanges();
       }),
       takeUntil(this.dispose$)
@@ -77,6 +74,9 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
     if (this.context && this.context.invalid) {
       return;
     }
+
+    this.setTempValue(this.formControlRef.value);
+
     this.showModal = true;
   }
 
@@ -101,14 +101,27 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
     this.dispose$.next(null);
     this.dispose$.complete();
   }
+
   private isOptionsArray() {
     return Array.isArray(this.options);
   }
+
   private isOptionsClosure() {
     return typeof this.options === 'function';
   }
+
   private isOptionsMap() {
     return !Array.isArray(this.options) && typeof this.options === 'object';
+  }
+
+  private setTempValue(value: any) {
+    if (value) {
+      if (Array.isArray(value)) {
+        this.tempValue = Set(fromJS(value));
+      } else {
+        this.tempValue = Set(fromJS([value]));
+      }
+    }
   }
 
   private setupOptions() {
@@ -137,13 +150,7 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
             this.optionValueToOptionLabelMap = this.optionValueToOptionLabelMap.set(option.get('value'), option.get('label'));
           });
 
-          if (this.default) {
-            if (Array.isArray(this.default)) {
-              this.tempValue = Set(fromJS(this.default));
-            } else {
-              this.tempValue = Set(fromJS([this.default]));
-            }
-          }
+          this.setTempValue(this.default);
 
           this.changeDetectionRef.detectChanges();
         }),
@@ -155,12 +162,6 @@ export class MultipleDropdownComponent implements OnInit, OnChanges, OnDestroy {
       this.optionValueToOptionLabelMap = this.optionValueToOptionLabelMap.set(option.get('value'), option.get('label'));
     });
 
-    if (this.default) {
-      if (Array.isArray(this.default)) {
-        this.tempValue = Set(fromJS(this.default));
-      } else {
-        this.tempValue = Set(fromJS([this.default]));
-      }
-    }
+    this.setTempValue(this.default);
   }
 }
